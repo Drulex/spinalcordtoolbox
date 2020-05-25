@@ -54,6 +54,7 @@ def main(args=None):
 
     # Dictionary containing list of URLs for data names. Mirror servers are listed in order of priority.
     dict_url = {
+
         'sct_example_data': ['https://osf.io/kjcgs/?action=download',
                              'https://www.neuro.polymtl.ca/_media/downloads/sct/20180525_sct_example_data.zip'],
         'sct_testing_data': ['https://osf.io/yutrj/?action=download',
