@@ -163,7 +163,6 @@ def get_parser():
     mathematical.add_argument(
         '-dim',
         type=int,
-        metavar=Metavar.int,
         help="Dimension of the array which 2D structural element will be orthogonal to. For example, if you wish to "
              "apply a 2D disk kernel in the X-Y plane, leaving Z unaffected, parameters will be: shape=disk, dim=2.",
         required=False,
@@ -353,9 +352,13 @@ def main(args=None):
         data_out = smooth(data, sigmas)
 
     elif arguments.dilate is not None:
+        if arguments.dim is None:
+            printv(parser.error('ERROR: -dim is required for -dilate and -erode'))
         data_out = sct.math.dilate(data, size=arguments.dilate, shape=arguments.shape, dim=arguments.dim)
 
     elif arguments.erode is not None:
+        if arguments.dim is None:
+            printv(parser.error('ERROR: -dim is required for -dilate and -erode'))
         data_out = sct.math.erode(data, size=arguments.erode, shape=arguments.shape, dim=arguments.dim)
 
     elif arguments.denoise is not None:
