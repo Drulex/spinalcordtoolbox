@@ -1,0 +1,34 @@
+name: pip-only
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: [ self-hosted, linux ]
+    container:
+      image: python:3.6
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Install dev package
+      run: pip install -e . -v
+    - name: Test with pytest
+      run: pytest
+
+  build-and-test-extended:
+    runs-on: [ self-hosted, linux ]
+    container:
+      image: python:3.6
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Install dev package
+      run: pip install -e . -v
+    - name: batch processing
+      run: ./batch_processing.sh

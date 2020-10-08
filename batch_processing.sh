@@ -26,6 +26,9 @@ set -ve
 # For full verbose, uncomment the next line
 # set -x
 
+SCRIPT=`realpath $0`
+SCT_DIR=`dirname $SCRIPT`
+
 # Fetch OS type
 if uname -a | grep -i  darwin > /dev/null 2>&1; then
   # OSX
