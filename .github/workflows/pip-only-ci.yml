@@ -2,7 +2,7 @@ name: pip-only
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, aj/pip-only-install ]
   pull_request:
     branches: [ master ]
 
