@@ -43,3 +43,14 @@ jobs:
       run: python -m pip install -e . -v
     - name: Test with pytest
       run: python -m pytest
+
+  build-and-test-w10-wsl:
+    runs-on: [ self-hosted, w10, wsl ]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: python -m pip install -r requirements.txt
+    - name: Install dev package
+      run: python -m pip install -e . -v
+    - name: Test with pytest
+      run: python -m pytest
