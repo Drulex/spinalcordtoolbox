@@ -2,8 +2,10 @@
 
 import os
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
 from codecs import open
 from os import path
+import sys
 
 here = path.abspath(path.dirname(__file__))
 
@@ -14,6 +16,43 @@ path_version = path.join(here, 'spinalcordtoolbox', 'version.txt')
 with open(path_version) as f:
     version = f.read().strip()
 
+class PostInstallSCT(develop):
+    """
+    Experimental post install code to replace install_sct.
+    This will work on an environment running python 3.6.
+    TODO: remove references to $SCT_DIR and friends in codebase
+    """
+    def run(self):
+        develop.run(self)
+
+        # FIXME: should use spinalcord.download to avoid this hack
+        sys.path.append(os.path.join(here, "scripts"))
+        import sct_download_data
+
+        data_dir = os.path.join(here, "data")
+        bin_dir = os.path.join(here, "bin")
+
+        if not os.path.exists(data_dir):
+            os.mkdir(data_dir)
+
+        if not os.path.exists(bin_dir):
+            os.mkdir(bin_dir)
+
+        from sys import platform
+        if platform == "linux" or platform == "linux2":
+            sct_download_data.main(['-d', "binaries_linux", '-o', os.path.join(here, "bin")])
+        elif platform == "darwin":
+            sct_download_data.main(['-d', "binaries_osx", '-o', os.path.join(here, "bin")])
+        elif platform == "win32":
+            raise ValueError("Windows installation is not supported!")
+
+        for dataset in ["PAM50", "gm_model", "optic_models", "pmj_models", "deepseg_sc_models", "deepseg_gm_models", "deepseg_lesion_models", "c2c3_disc_models"]:
+            sct_download_data.main(['-d', dataset, '-o', os.path.join(here, "data", dataset)])
+
+        import spinalcordtoolbox.deepseg.models
+        spinalcordtoolbox.deepseg.models.install_default_models()
+
+
 setup(
     name='spinalcordtoolbox',
     version=version,
@@ -23,6 +62,9 @@ setup(
     author='NeuroPoly Lab, Polytechnique Montreal',
     author_email='neuropoly@googlegroups.com',
     license='MIT',
+    cmdclass={
+        'develop': PostInstallSCT,
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Healthcare Industry',
