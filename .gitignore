@@ -47,4 +47,5 @@ sct_example_data/
 
 # Documentation
 documentation/build
+build/
 
