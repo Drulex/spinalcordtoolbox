@@ -57,6 +57,18 @@ setup(
                       'transforms3d',
                       'urllib3[secure]',
                       ],
+    data_files=[
+        ('bin', ['bin/isct_antsApplyTransforms',
+                 'bin/isct_antsRegistration',
+                 'bin/isct_antsSliceRegularizedRegistration',
+                 'bin/isct_ComposeMultiTransform',
+                 'bin/isct_dice_coefficient',
+                 'bin/isct_propseg',
+                 'bin/isct_spine_detect',
+                 'bin/isct_train_svm',
+                 ]
+         ),
+    ],
     extras_require={
         'docs': [
             'sphinx',
