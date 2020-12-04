@@ -7,15 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
-  build-and-test-debian:
+  debian-CI:
     runs-on: [ ubuntu-latest ]
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        container:
-        - 'ubuntu:16.04'
-        - 'ubuntu:18.04'
-        - 'ubuntu:20.04'
+        container: ['ubuntu:16.04', 'ubuntu:18.04', 'ubuntu:20.04']
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v2
@@ -27,14 +24,12 @@ jobs:
     - name: Run CI
       run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
 
-  build-and-test-redhat:
+  redhat-CI:
     runs-on: [ ubuntu-latest ]
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        container:
-        - 'centos:8'
-        - 'centos:7'
+        container: ['centos:8', 'centos:7']
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v2
@@ -42,6 +37,36 @@ jobs:
     - name: Update system
       run: yum update -y
     - name: Install tooling
-      run: yum install -y gcc curl git
+      run: yum install -y gcc curl git which
     - name: Run CI
       run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
+
+  macOS-CI:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # prevent cancellation of all jobs is one fails
+      matrix:
+        os: [macos-11.0, macos-10.15]
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout code
+    - name: Run CI
+      run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
+
+  windows-CI:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # prevent cancellation of all jobs is one fails
+      matrix:
+        os: [windows-2019, windows-2016]
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout code
+    - name: Instal WSL
+      run: choco install wsl-ubuntu-1804 -y --ignore-checksums
+    - name: Enter WSL
+      run: wsl
+    - name: Update system/tooling
+      run: DEBIAN_FRONTEND="noninteractive" WSLENV=DEBIAN_FRONTEND apt-get update && apt-get install -y gcc git curl
+    - name: Run CI
+      run: SCT_INSTALL_TYPE="in-place" wsl ./.ci.sh
