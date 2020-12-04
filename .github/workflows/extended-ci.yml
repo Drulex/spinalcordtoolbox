@@ -1,10 +1,9 @@
-name: simple-ci
+name: extended-ci
 
+# FIXME only run on master when done testing
 on:
   push:
-    branches: [ aj-basic-github-actions ]
-  pull_request:
-    branches: [ master ]
+    branches: [ master, aj-basic-github-actions ]
 
 jobs:
   debian-CI:
@@ -12,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        container: ['ubuntu:20.04']
+        container: ['ubuntu:16.04', 'ubuntu:18.04', 'ubuntu:20.04', 'debian:testing', 'debian:10', 'debian:9']
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v2
@@ -27,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        container: ['centos:8']
+        container: ['centos:8', 'centos:7', 'fedora:33', 'fedora:32', 'fedora:31']
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v2
@@ -42,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        os: [macos-10.15]
+        os: [macos-11.0, macos-10.15]
     steps:
     - uses: actions/checkout@v2
       name: Checkout code
@@ -54,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false # prevent cancellation of all jobs is one fails
       matrix:
-        os: [windows-2019]
+        os: [windows-2019, windows-2016]
     defaults:
       run:
         shell: wsl-bash {0}
@@ -69,5 +68,20 @@ jobs:
           curl
     - uses: actions/checkout@v2
       name: Checkout code
+    - name: Run CI
+      run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
+
+  archlinux-CI:
+    runs-on: [ ubuntu-latest ]
+    strategy:
+      fail-fast: false # prevent cancellation of all jobs is one fails
+      matrix:
+        container: ['archlinux']
+    container: ${{ matrix.container }}
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout code
+    - name: Update system/tooling
+      run: pacman -Sy --noconfirm which gcc git curl
     - name: Run CI
       run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
