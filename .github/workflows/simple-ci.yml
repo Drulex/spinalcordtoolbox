@@ -26,3 +26,22 @@ jobs:
       run: DEBIAN_FRONTEND=noninteractive apt install -y gcc curl git libglib2.0-0  # for pyqt5 TODO investigate libglib2 requirement
     - name: Run CI
       run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
+
+  build-and-test-redhat:
+    runs-on: [ ubuntu-latest ]
+    strategy:
+      fail-fast: false # prevent cancellation of all jobs is one fails
+      matrix:
+        container:
+        - 'centos:8'
+        - 'centos:7'
+    container: ${{ matrix.container }}
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout code
+    - name: Update system
+      run: yum update -y
+    - name: Install tooling
+      run: yum install -y gcc curl git
+    - name: Run CI
+      run: SCT_INSTALL_TYPE="in-place" ./.ci.sh
